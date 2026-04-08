@@ -36,16 +36,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import medina.jonathan.login.ui.theme.LoginTheme
 
 class ContrasenaActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        auth = Firebase.auth
         setContent {
             LoginTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PantallaContrasena(
+                        auth,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -55,7 +62,7 @@ class ContrasenaActivity : ComponentActivity() {
 }
 
 @Composable
-fun PantallaContrasena(modifier: Modifier = Modifier) {
+fun PantallaContrasena(auth: FirebaseAuth, modifier: Modifier = Modifier) {
     var correo by remember(){ mutableStateOf(value="") }
     val context = LocalContext.current
 
@@ -88,22 +95,39 @@ fun PantallaContrasena(modifier: Modifier = Modifier) {
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)
             }) {
-                Text(text = "Cancelar")
+                Text(text = "Volver a Inicio")
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {
-                var mensaje: String = ""
 
                 if (correo.isEmpty() || "@" !in correo) {
-                    mensaje = "Error: El correo electrónico es inválido o está vacío."
+                    Toast.makeText(
+                        context,
+                        "Error: El correo electrónico es inválido o está vacío.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 else {
-                    mensaje = "El correo de recuperación fue enviado a $correo."
+                    auth.sendPasswordResetEmail(correo)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(
+                                    context,
+                                    "Se ha enviado un enlace de recuperación a $correo.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            else {
+                                Toast.makeText(
+                                    context,
+                                    "Error al enviar el enlace de recuperación.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                 }
-
-                Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
             }) {
                 Text(
                     text = "Enviar enlace de recuperación",
@@ -111,18 +135,6 @@ fun PantallaContrasena(modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center
                 )
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview2() {
-    LoginTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            PantallaContrasena(
-                modifier = Modifier.padding(innerPadding)
-            )
         }
     }
 }

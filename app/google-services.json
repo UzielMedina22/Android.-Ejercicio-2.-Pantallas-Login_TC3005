@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "600990538554",
+    "project_id": "usuarios-bacd8",
+    "storage_bucket": "usuarios-bacd8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600990538554:android:f621ddad1dec6b85564e03",
+        "android_client_info": {
+          "package_name": "medina.jonathan.login"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe855Vip2mRkuZppyOhpxHgcty1WURQU0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

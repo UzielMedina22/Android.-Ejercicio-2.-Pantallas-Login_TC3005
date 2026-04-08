@@ -35,18 +35,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import medina.jonathan.login.ui.theme.LoginTheme
 import java.util.Calendar
 import java.util.Date
 
 class RegistroActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        auth = Firebase.auth
         setContent {
             LoginTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PantallaRegistro(
+                        auth,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -56,13 +63,15 @@ class RegistroActivity : ComponentActivity() {
 }
 
 @Composable
-fun PantallaRegistro(modifier: Modifier = Modifier) {
+fun PantallaRegistro(auth: FirebaseAuth, modifier: Modifier = Modifier) {
     var nombre by remember(){ mutableStateOf(value="") }
     var correo by remember(){ mutableStateOf(value="") }
     var password by remember(){ mutableStateOf(value="") }
     var verificarPassword by remember(){ mutableStateOf(value="") }
     var fechaNacimiento by remember(){ mutableStateOf(value="") }
     val context = LocalContext.current
+
+
 
     Column(
         modifier = modifier.fillMaxSize().padding(all = 32.dp),
@@ -133,8 +142,6 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {
-                var mensaje: String = ""
-                var errores: Int = 0
                 var anioActual: Int = Calendar.getInstance().get(Calendar.YEAR)
                 var anioNacimiento: Int = 0
                 var edad: Int = 0
@@ -146,52 +153,69 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
 
                 if (nombre.isEmpty() || correo.isEmpty()|| fechaNacimiento.isEmpty() ||
                     password.isEmpty() || verificarPassword.isEmpty()) {
-                    mensaje = "Error: Alguno(s) de los campos está(n) vacío(s)."
-                    errores += 1
+                    Toast.makeText(
+                        context,
+                        "Error: Alguno(s) de los campos está(n) vacío(s).",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 else if (!correo.isEmpty() && "@" !in correo) {
-                    mensaje = "Error: El formato del correo es incorrecto."
+                    Toast.makeText(
+                        context,
+                        "Error: El formato del correo es incorrecto.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 else if (!fechaNacimiento.isEmpty() &&
                     (fechaNacimiento[2] != '/' || fechaNacimiento[5] != '/')) {
-                    mensaje = "Error: El formato de la fecha de nacimiento es incorrecto."
+                    Toast.makeText(
+                        context,
+                        "Error: El formato de la fecha de nacimiento es incorrecto.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 else if (edad < 18) {
-                    mensaje = "Error: La cuenta no se puede crear porque el usuario es menor de 18 años."
+                    Toast.makeText(
+                        context,
+                        "Error: La cuenta no se puede crear porque el usuario es menor de 18 años.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 else if ((!password.isEmpty() && !verificarPassword.isEmpty()) &&
                     (password != verificarPassword)){
-                    mensaje = "Error: Las contraseñas no coinciden."
+                    Toast.makeText(
+                        context,
+                        "Error: Las contraseñas no coinciden.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 else {
-                    mensaje = "La cuenta fue creada exitosamente."
+                    auth.createUserWithEmailAndPassword(correo, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(
+                                    context,
+                                    "Éxito al crear la cuenta.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            else {
+                                Toast.makeText(
+                                    context,
+                                    "Error al crear la cuenta.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                 }
-
-                Toast.makeText(
-                    context,
-                    mensaje,
-                    Toast.LENGTH_SHORT
-                ).show()
             }) {
                 Text(text = "Crear cuenta", fontSize = 16.sp)
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview3() {
-    LoginTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            PantallaRegistro(
-                modifier = Modifier.padding(innerPadding)
-            )
         }
     }
 }

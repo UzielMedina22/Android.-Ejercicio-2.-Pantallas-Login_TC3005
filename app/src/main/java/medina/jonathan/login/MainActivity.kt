@@ -34,16 +34,23 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import medina.jonathan.login.ui.theme.LoginTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        auth = Firebase.auth
         setContent {
             LoginTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PantallaInicio(
+                        auth,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -53,7 +60,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun PantallaInicio(modifier: Modifier = Modifier) {
+fun PantallaInicio(auth: FirebaseAuth, modifier: Modifier = Modifier) {
 
     var correo by remember(){ mutableStateOf(value="") }
     var password by remember(){ mutableStateOf(value="") }
@@ -99,16 +106,27 @@ fun PantallaInicio(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {
-                var mensaje: String = ""
-
                 if (correo.isEmpty() || "@" !in correo || password.isEmpty()) {
-                    mensaje = "Error: El correo o la contraseña están vacíos o inválidos."
+                    Toast.makeText(
+                        context,
+                        "Error: El correo o la contraseña están vacíos o inválidos.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    auth.signInWithEmailAndPassword(correo, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val intent = Intent(context, PrincipalActivity::class.java)
+                                context.startActivity(intent)
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Error: Credenciales inválidas.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                 }
-                else {
-                    mensaje = "Se ha iniciado sesión correctamente."
-                }
-
-                Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
             }) {
                 Text(text = "Iniciar sesión", fontSize = 16.sp)
             }
@@ -121,18 +139,6 @@ fun PantallaInicio(modifier: Modifier = Modifier) {
             context.startActivity(intent)
         }) {
             Text(text = "¿Olvidaste tu contraseña?")
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LoginTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            PantallaInicio(
-                modifier = Modifier.padding(innerPadding)
-            )
         }
     }
 }
