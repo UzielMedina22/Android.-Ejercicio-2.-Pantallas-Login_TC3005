@@ -2,6 +2,7 @@ package medina.jonathan.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -98,6 +99,16 @@ fun PantallaInicio(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {
+                var mensaje: String = ""
+
+                if (correo.isEmpty() || "@" !in correo || password.isEmpty()) {
+                    mensaje = "Error: El correo o la contraseña están vacíos o inválidos."
+                }
+                else {
+                    mensaje = "Se ha iniciado sesión correctamente."
+                }
+
+                Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
             }) {
                 Text(text = "Iniciar sesión", fontSize = 16.sp)
             }

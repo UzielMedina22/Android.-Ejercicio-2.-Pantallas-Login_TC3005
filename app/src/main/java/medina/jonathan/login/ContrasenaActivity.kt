@@ -103,13 +103,13 @@ fun PantallaContrasena(modifier: Modifier = Modifier) {
                     mensaje = "El correo de recuperación fue enviado a $correo."
                 }
 
-                Toast.makeText(
-                    context,
-                    mensaje,
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
             }) {
-                Text(text = "Enviar enlace de recuperación", fontSize = 16.sp)
+                Text(
+                    text = "Enviar enlace de recuperación",
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }

@@ -69,7 +69,7 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Registro", fontSize = 42.sp)
+        Text(text = "Registro", fontSize = 64.sp)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -114,7 +114,7 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
 
         OutlinedTextField(
             value = verificarPassword,
-            onValueChange = { password = it },
+            onValueChange = { verificarPassword = it },
             label = {Text(text = "Verificar contraseña")},
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
@@ -133,56 +133,50 @@ fun PantallaRegistro(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {
+                var mensaje: String = ""
+                var errores: Int = 0
                 var anioActual: Int = Calendar.getInstance().get(Calendar.YEAR)
-                var anioNacimiento: Int = fechaNacimiento.subSequence(6, fechaNacimiento.length).toString().toInt()
-                val edad: Int = anioActual - anioNacimiento
-                print("Año: $anioActual")
+                var anioNacimiento: Int = 0
+                var edad: Int = 0
+
+                if (fechaNacimiento.isNotEmpty()) {
+                    anioNacimiento = fechaNacimiento.subSequence(6, fechaNacimiento.length).toString().toInt()
+                    edad = anioActual - anioNacimiento
+                }
 
                 if (nombre.isEmpty() || correo.isEmpty()|| fechaNacimiento.isEmpty() ||
                     password.isEmpty() || verificarPassword.isEmpty()) {
-                    Toast.makeText(
-                        context,
-                        "Error: Alguno(s) de los campos está vacío.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mensaje = "Error: Alguno(s) de los campos está(n) vacío(s)."
+                    errores += 1
                 }
+
                 else if (!correo.isEmpty() && "@" !in correo) {
-                    Toast.makeText(
-                        context,
-                        "Error: El formato del correo es incorrecto.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mensaje = "Error: El formato del correo es incorrecto."
                 }
+
                 else if (!fechaNacimiento.isEmpty() &&
                     (fechaNacimiento[2] != '/' || fechaNacimiento[5] != '/')) {
-                    Toast.makeText(
-                        context,
-                        "Error: El formato de la fecha de nacimiento es incorrecto.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mensaje = "Error: El formato de la fecha de nacimiento es incorrecto."
                 }
+
                 else if (edad < 18) {
-                    Toast.makeText(
-                        context,
-                        "Error: La cuenta no se puede crear porque el usuario es menor de 18 años.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mensaje = "Error: La cuenta no se puede crear porque el usuario es menor de 18 años."
                 }
+
                 else if ((!password.isEmpty() && !verificarPassword.isEmpty()) &&
                     (password != verificarPassword)){
-                    Toast.makeText(
-                        context,
-                        "Error: Las contraseñas no coinciden.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mensaje = "Error: Las contraseñas no coinciden."
                 }
+
                 else {
-                    Toast.makeText(
-                        context,
-                        "La cuenta fue creada exitosamente.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    mensaje = "La cuenta fue creada exitosamente."
                 }
+
+                Toast.makeText(
+                    context,
+                    mensaje,
+                    Toast.LENGTH_SHORT
+                ).show()
             }) {
                 Text(text = "Crear cuenta", fontSize = 16.sp)
             }
