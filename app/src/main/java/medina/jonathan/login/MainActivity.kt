@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,8 +69,9 @@ fun PantallaInicio(modifier: Modifier = Modifier) {
 
         OutlinedTextField(
             value = correo,
-            onValueChange = { correo = it },  // Se cambia el valor así mismo como un lambda.
+            onValueChange = { correo = it },
             label = {Text(text = "Correo electrónico")},
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -76,7 +79,7 @@ fun PantallaInicio(modifier: Modifier = Modifier) {
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },  // Se cambia el valor así mismo como un lambda.
+            onValueChange = { password = it },
             label = {Text(text = "Contraseña")},
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
@@ -86,6 +89,8 @@ fun PantallaInicio(modifier: Modifier = Modifier) {
 
         Row(){
             Button(onClick = {
+                val intent = Intent(context, RegistroActivity::class.java)
+                context.startActivity(intent)
             }) {
                 Text(text = "Registrarse", fontSize = 16.sp)
             }
