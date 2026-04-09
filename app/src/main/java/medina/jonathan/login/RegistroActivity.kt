@@ -38,22 +38,28 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 import medina.jonathan.login.ui.theme.LoginTheme
 import java.util.Calendar
 import java.util.Date
 
 class RegistroActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         auth = Firebase.auth
+        database = Firebase.database.reference
         setContent {
             LoginTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     PantallaRegistro(
                         auth,
+                        database,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -63,15 +69,13 @@ class RegistroActivity : ComponentActivity() {
 }
 
 @Composable
-fun PantallaRegistro(auth: FirebaseAuth, modifier: Modifier = Modifier) {
+fun PantallaRegistro(auth: FirebaseAuth, database: DatabaseReference, modifier: Modifier = Modifier) {
     var nombre by remember(){ mutableStateOf(value="") }
     var correo by remember(){ mutableStateOf(value="") }
     var password by remember(){ mutableStateOf(value="") }
     var verificarPassword by remember(){ mutableStateOf(value="") }
     var fechaNacimiento by remember(){ mutableStateOf(value="") }
     val context = LocalContext.current
-
-
 
     Column(
         modifier = modifier.fillMaxSize().padding(all = 32.dp),
@@ -203,6 +207,12 @@ fun PantallaRegistro(auth: FirebaseAuth, modifier: Modifier = Modifier) {
                                     "Éxito al crear la cuenta.",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                var usuario = Usuario(nombre, correo, fechaNacimiento)
+                                var userID = auth.currentUser?.uid ?: "Anonimo"
+                                database.child("usuarios").child(userID).setValue(usuario)
+                                val intent = Intent(context, PrincipalActivity::class.java)
+                                intent.putExtra("correo", correo)
+                                context.startActivity(intent)
                             }
                             else {
                                 Toast.makeText(

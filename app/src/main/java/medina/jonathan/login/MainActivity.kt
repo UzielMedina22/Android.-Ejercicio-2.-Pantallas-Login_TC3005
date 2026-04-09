@@ -37,15 +37,20 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 import medina.jonathan.login.ui.theme.LoginTheme
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         auth = Firebase.auth
+        database = Firebase.database
+
         setContent {
             LoginTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -117,6 +122,7 @@ fun PantallaInicio(auth: FirebaseAuth, modifier: Modifier = Modifier) {
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 val intent = Intent(context, PrincipalActivity::class.java)
+                                intent.putExtra("correo", correo)
                                 context.startActivity(intent)
                             } else {
                                 Toast.makeText(
