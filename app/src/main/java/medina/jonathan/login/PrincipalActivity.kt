@@ -17,11 +17,12 @@ class PrincipalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        var correo = intent.getStringExtra("correo") ?: "Anónimo"
         setContent {
             LoginTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    PantallaPrincipal(
+                        name = correo,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -31,17 +32,9 @@ class PrincipalActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun PantallaPrincipal(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
+        text = "¡Bienvenido, $name!",
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview3() {
-    LoginTheme {
-        Greeting("Android")
-    }
 }
