@@ -51,6 +51,11 @@ class MainActivity : ComponentActivity() {
         auth = Firebase.auth
         database = Firebase.database
 
+        if (auth.currentUser != null) {
+            val intent = Intent(this, PrincipalActivity::class.java)
+            startActivity(intent)
+        }
+
         setContent {
             LoginTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -122,7 +127,6 @@ fun PantallaInicio(auth: FirebaseAuth, modifier: Modifier = Modifier) {
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 val intent = Intent(context, PrincipalActivity::class.java)
-                                intent.putExtra("correo", correo)
                                 context.startActivity(intent)
                             } else {
                                 Toast.makeText(

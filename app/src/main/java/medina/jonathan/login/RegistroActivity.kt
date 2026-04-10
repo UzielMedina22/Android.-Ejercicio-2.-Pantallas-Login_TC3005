@@ -68,6 +68,31 @@ class RegistroActivity : ComponentActivity() {
     }
 }
 
+
+fun obtenerEdad(fechaNacimiento: String): Int{
+    var anioActual: Int = Calendar.getInstance().get(Calendar.YEAR)
+    var mesActual: Int = Calendar.getInstance().get(Calendar.MONTH)
+    var diaActual: Int = Calendar.getInstance().get(Calendar.DAY_OF_WEEK_IN_MONTH)
+    var anioNacimiento: Int = 0
+    var mesNacimiento: Int = 0
+    var diaNacimiento: Int = 0
+    var edad: Int = 0
+
+    if (fechaNacimiento.isNotEmpty()) {
+        mesNacimiento = fechaNacimiento.subSequence(3, 5).toString().toInt()
+        diaNacimiento = fechaNacimiento.subSequence(0, 2).toString().toInt()
+        anioNacimiento = fechaNacimiento.subSequence(6, fechaNacimiento.length).toString().toInt()
+        edad = anioActual - anioNacimiento
+
+        if ((mesActual < mesNacimiento) ||
+            ((mesActual < mesNacimiento) && (diaActual < diaNacimiento))) {
+            edad--
+        }
+    }
+
+    return edad
+}
+
 @Composable
 fun PantallaRegistro(auth: FirebaseAuth, database: DatabaseReference, modifier: Modifier = Modifier) {
     var nombre by remember(){ mutableStateOf(value="") }
@@ -146,13 +171,10 @@ fun PantallaRegistro(auth: FirebaseAuth, database: DatabaseReference, modifier: 
             Spacer(modifier = Modifier.width(16.dp))
 
             Button(onClick = {
-                var anioActual: Int = Calendar.getInstance().get(Calendar.YEAR)
-                var anioNacimiento: Int = 0
                 var edad: Int = 0
 
                 if (fechaNacimiento.isNotEmpty()) {
-                    anioNacimiento = fechaNacimiento.subSequence(6, fechaNacimiento.length).toString().toInt()
-                    edad = anioActual - anioNacimiento
+                    edad = obtenerEdad(fechaNacimiento)
                 }
 
                 if (nombre.isEmpty() || correo.isEmpty()|| fechaNacimiento.isEmpty() ||
@@ -210,8 +232,7 @@ fun PantallaRegistro(auth: FirebaseAuth, database: DatabaseReference, modifier: 
                                 var usuario = Usuario(nombre, correo, fechaNacimiento)
                                 var userID = auth.currentUser?.uid ?: "Anonimo"
                                 database.child("usuarios").child(userID).setValue(usuario)
-                                val intent = Intent(context, PrincipalActivity::class.java)
-                                intent.putExtra("correo", correo)
+                                val intent = Intent(context, MainActivity::class.java)
                                 context.startActivity(intent)
                             }
                             else {
